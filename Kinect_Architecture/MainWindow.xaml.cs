@@ -44,7 +44,7 @@ namespace Kinect
         public GestureController gestureController;
         private int xZoomL, xZoomR;
 
-       // private SkeletonManagement[] SkeletonManagementData = new SkeletonManagement[0];                // Tableau pour la gestion des SkeletonManagement
+        private SkeletonManagement[] SkeletonManagementData = new SkeletonManagement[0];                // Tableau pour la gestion des SkeletonManagement
         private Stickman[] StickManData = new Stickman[0];                                              // Tableau des StickMan de chaque Skeleton
         private int i;
 
@@ -187,77 +187,50 @@ namespace Kinect
                         this.skeletonData = new Skeleton[skeletonFrame.SkeletonArrayLength];
 
                         // Actualise le tableau de SkeletonManagement en fonction du nombre de Skeleton
-                  //      SkeletonManagementData = new SkeletonManagement[skeletonFrame.SkeletonArrayLength];
-
-                        // Actualise le tableau de stickman en fonction du nombre de Skeleton
-                        StickManData = new Stickman[skeletonFrame.SkeletonArrayLength];
+                        SkeletonManagementData = new SkeletonManagement[skeletonFrame.SkeletonArrayLength];
                     }
 
                     skeletonFrame.CopySkeletonDataTo(this.skeletonData);
 
-                                                                /////////////////////// SELECTION SKELETON //////////////////////
-                 /*   i = 0;
-                    foreach (Skeleton skeleton in skeletonData)
-                    {
-                        SkeletonManagementData[i] = new SkeletonManagement(skeleton);
-                        i++;
-                    }
-                   */
-
+                    /////////////////////// SELECTION SKELETON //////////////////////
 
                     // Assume no nearest skeleton and that the nearest skeleton is a long way away.
-                    var newNearestId = -1;
                     var nearestDistance2 = double.MaxValue;
 
+                    i = 0;
                     foreach (Skeleton skeleton in skeletonData)
                     {
+                        // Ajout du skeleton au tableau de gestion des skeletons
+                        SkeletonManagementData[i] = new SkeletonManagement(skeleton, StickMen);
+
                         // Only consider tracked skeletons.
                         if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
                         {
-                            // Find the distance squared.
-                            var distance2 = (skeleton.Position.X * skeleton.Position.X) +
-                                (skeleton.Position.Y * skeleton.Position.Y) +
-                                (skeleton.Position.Z * skeleton.Position.Z);
-
-                            // Is the new distance squared closer than the nearest so far?
-                            if (distance2 < nearestDistance2)
-                            {
-                                // Use the new values.
-                                newNearestId = skeleton.TrackingId;
-                                nearestDistance2 = distance2;
-                            }
+                            nearestId = SkeletonManagementData[i].NearestID((float)nearestDistance2, nearestId);
                         }
+
+                        i++;
                     }
+                    ///////////////////////// STICKMAN //////////////////////////
 
-                    if (nearestId != newNearestId)
-                    {
-                        nearestId = newNearestId;
-                    }
-
-                                                                     ///////////////////////// STICKMAN //////////////////////////
-
-                     // Remove any previous skeletons.
+                    // Remove any previous skeletons.
                     StickMen.Children.Clear();
-                    
+
                     i = 0;
                     foreach (Skeleton skeleton in skeletonData)
                     {
-                        // Crée un Stickman pour chaque skeleton
-                        StickManData[i] = new Stickman(skeleton, Brushes.WhiteSmoke, 7, StickMen);
-
                         if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
                         {
-                            // Draw a background for the next pass.
-                            StickManData[i].DrawStickMan();
+                            // Dessine un stickman en fond
+                            SkeletonManagementData[i].stickman.DrawStickMan(Brushes.WhiteSmoke, 7);
                         }
-                        
+
                         i++;
                     }
 
                     i = 0;
                     foreach (Skeleton skeleton in skeletonData)
                     {
-                        
                         // Only draw tracked skeletons.
                         if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
                         {
@@ -266,19 +239,18 @@ namespace Kinect
                                 skeleton.TrackingId == this.nearestId ? Brushes.Black : Brushes.Gray;
 
                             // Draw the individual skeleton.
-                            StickManData[i].DrawStickMan(brush, 3);
+                            SkeletonManagementData[i].stickman.DrawStickMan(brush, 3);
                         }
 
                         i++;
+                        ////////////////////////// CURSEUR ///////////////////////////////
 
-                                                                      ////////////////////////// CURSEUR ///////////////////////////////
-                       
                         if (skeleton.TrackingId == nearestId)
                         {
                             skeletonFocus = skeleton;
                             gestureController.UpdateAllGestures(skeleton);
 
-                          //  nearestId = skeleton.TrackingId;
+                            //  nearestId = skeleton.TrackingId;
 
                             if (ZoomDezoom(skeletonFocus)) //mode zoom
                             {

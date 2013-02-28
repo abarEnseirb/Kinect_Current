@@ -26,13 +26,13 @@ namespace Kinect_Architecture
     public class Stickman
     {
 
-        
-        private Skeleton skeleton { get; set; }
-        private Brush brush { get; set; }
-        private int thickness { get; set; }
-        private Canvas StickMen { get; set; }
 
-       
+        public Skeleton skeleton { get; set; }
+        public Brush brush { get; set; }
+        public int thickness { get; set; }
+        public Canvas StickMen { get; set; }
+
+
         private static readonly JointType[][] SkeletonSegmentRuns = new JointType[][]
         {
             new JointType[] 
@@ -53,17 +53,25 @@ namespace Kinect_Architecture
             }
         };
 
-      
-        public Stickman(Skeleton skeleton, Brush brush, int thickness, Canvas StickMen)
+
+        public Stickman(Skeleton skeleton, Canvas StickMen)
         {
             this.skeleton = skeleton;
-            this.brush = brush;
-            this.thickness = thickness;
+            this.brush = Brushes.WhiteSmoke;
+            this.thickness = 7;
             this.StickMen = StickMen;
         }
 
-        
-     
+        public void setBrush(Brush brush)
+        {
+            this.brush = brush;
+        }
+
+        public void setThickness(int thickness)
+        {
+            this.thickness = thickness;
+        }
+
         public Point GetJointPoint(JointType jointType)
         {
             var joint = this.skeleton.Joints[jointType];
