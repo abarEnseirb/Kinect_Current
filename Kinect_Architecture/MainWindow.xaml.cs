@@ -45,7 +45,6 @@ namespace Kinect
         private int xZoomL, xZoomR;
 
         private SkeletonManagement[] SkeletonManagementData = new SkeletonManagement[0];                // Tableau pour la gestion des SkeletonManagement
-        private Stickman[] StickManData = new Stickman[0];                                              // Tableau des StickMan de chaque Skeleton
         private int i;
 
         private static readonly JointType[][] SkeletonSegmentRuns = new JointType[][]
@@ -235,14 +234,14 @@ namespace Kinect
                         if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
                         {
                             // Pick a brush, Red for a skeleton that has recently gestures, black for the nearest, gray otherwise.
-                            var brush = DateTime.UtcNow < this.highlightTime && skeleton.TrackingId == this.highlightId ? Brushes.Red :
-                                skeleton.TrackingId == this.nearestId ? Brushes.Black : Brushes.Gray;
+                            var brush = DateTime.UtcNow < highlightTime && skeleton.TrackingId == highlightId ? Brushes.Red :
+                                skeleton.TrackingId == nearestId ? Brushes.Black : Brushes.Gray;
 
                             // Draw the individual skeleton.
                             SkeletonManagementData[i].stickman.DrawStickMan(brush, 3);
                         }
 
-                        i++;
+                     
                         ////////////////////////// CURSEUR ///////////////////////////////
 
                         if (skeleton.TrackingId == nearestId)
@@ -261,8 +260,9 @@ namespace Kinect
                             else //mode curseur sinon
                             {
                                 rectZoom.Visibility = Visibility.Hidden;
-                                ColorImagePoint handColorPoint = HandFocus(skeleton);
-                                // ColorImagePoint handColorPoint = cm.MapSkeletonPointToColorPoint(skeleton.Joints[JointType.HandRight].Position, ColorImageFormat.RgbResolution1280x960Fps12);
+
+                                ColorImagePoint handColorPoint = SkeletonManagementData[i].HandFocus(sensor, curseur);
+
                                 Canvas.SetLeft(curseur, 2 * (handColorPoint.X) - (curseur.Width / 2));
                                 Canvas.SetTop(curseur, 2 * (handColorPoint.Y) - (curseur.Width / 2));
                                 Canvas.SetLeft(Rond, 2 * (handColorPoint.X) - (Rond.Width / 2));
@@ -305,6 +305,7 @@ namespace Kinect
                                 }
                             }
                         }
+                        i++;
                     }
                 }
             }
@@ -365,25 +366,6 @@ namespace Kinect
             }
         }
 
-        private ColorImagePoint HandFocus(Skeleton skeleton)
-        {
-            CoordinateMapper cmLeft = new CoordinateMapper(this.sensor);
-            CoordinateMapper cmRight = new CoordinateMapper(this.sensor);
-            ColorImagePoint Left = cmLeft.MapSkeletonPointToColorPoint(skeleton.Joints[JointType.HandLeft].Position, ColorImageFormat.RgbResolution1280x960Fps12);
-            ColorImagePoint Right = cmRight.MapSkeletonPointToColorPoint(skeleton.Joints[JointType.HandRight].Position, ColorImageFormat.RgbResolution1280x960Fps12);
-
-            if (Right.Y < Left.Y)
-            {
-                curseur.Source = new BitmapImage(new Uri("Ressources/Images/hand_r.png", UriKind.Relative));
-                return Right;
-            }
-            else
-            {
-                curseur.Source = new BitmapImage(new Uri("Ressources/Images/hand_l.png", UriKind.Relative));
-                return Left;
-            }
-        }
-
         private bool gridContainsCurseur(Grid grid, Point Curseur)
         {
             Double Left = 0;
@@ -404,12 +386,13 @@ namespace Kinect
         private void HighlightSkeleton(Skeleton skeleton)
         {
             // Set the highlight time to be a short time from now.
-            this.highlightTime = DateTime.UtcNow + TimeSpan.FromSeconds(0.5);
+            highlightTime = DateTime.UtcNow + TimeSpan.FromSeconds(0.5);
 
             // Record the ID of the skeleton.
-            this.highlightId = skeleton.TrackingId;
+            highlightId = skeleton.TrackingId;
         }
 
+        /*
         private Point GetJointPoint(Skeleton skeleton, JointType jointType)
         {
             var joint = skeleton.Joints[jointType];
@@ -424,8 +407,8 @@ namespace Kinect
 
             return point;
         }
-
-        Timer _clearTimer;
+        */
+      
 
         private string _gesture;
         public String Gesture

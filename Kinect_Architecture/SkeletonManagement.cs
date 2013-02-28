@@ -59,5 +59,28 @@ namespace Kinect_Architecture
 
             return nearestId;
         }
+
+
+        public ColorImagePoint HandFocus(KinectSensor sensor, Image curseur)
+        {
+            CoordinateMapper cmLeft = new CoordinateMapper(sensor);
+            CoordinateMapper cmRight = new CoordinateMapper(sensor);
+            ColorImagePoint Left = cmLeft.MapSkeletonPointToColorPoint(this.skeleton.Joints[JointType.HandLeft].Position, ColorImageFormat.RgbResolution1280x960Fps12);
+            ColorImagePoint Right = cmRight.MapSkeletonPointToColorPoint(this.skeleton.Joints[JointType.HandRight].Position, ColorImageFormat.RgbResolution1280x960Fps12);
+
+            if (Right.Y < Left.Y)
+            {
+                curseur.Source = new BitmapImage(new Uri("Ressources/Images/hand_r.png", UriKind.Relative));
+                return Right;
+            }
+            else
+            {
+                curseur.Source = new BitmapImage(new Uri("Ressources/Images/hand_l.png", UriKind.Relative));
+                return Left;
+            }
+        }
+
+ 
+
     }
 }

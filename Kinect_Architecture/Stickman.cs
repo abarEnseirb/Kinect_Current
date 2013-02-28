@@ -26,7 +26,6 @@ namespace Kinect_Architecture
     public class Stickman
     {
 
-
         public Skeleton skeleton { get; set; }
         public Brush brush { get; set; }
         public int thickness { get; set; }
