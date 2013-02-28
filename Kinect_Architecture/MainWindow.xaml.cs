@@ -47,26 +47,6 @@ namespace Kinect
         private SkeletonManagement[] SkeletonManagementData = new SkeletonManagement[0];                // Tableau pour la gestion des SkeletonManagement
         private int i;
 
-        private static readonly JointType[][] SkeletonSegmentRuns = new JointType[][]
-        {
-            new JointType[] 
-            { 
-                JointType.Head, JointType.ShoulderCenter, JointType.HipCenter 
-            },
-            new JointType[] 
-            { 
-                JointType.HandLeft, JointType.WristLeft, JointType.ElbowLeft, JointType.ShoulderLeft,
-                JointType.ShoulderCenter,
-                JointType.ShoulderRight, JointType.ElbowRight, JointType.WristRight, JointType.HandRight
-            },
-            new JointType[]
-            {
-                JointType.FootLeft, JointType.AnkleLeft, JointType.KneeLeft, JointType.HipLeft,
-                JointType.HipCenter,
-                JointType.HipRight, JointType.KneeRight, JointType.AnkleRight, JointType.FootRight
-            }
-        };
-
         /// <summary>
         /// Time until skeleton ceases to be highlighted.
         /// </summary>
@@ -191,10 +171,11 @@ namespace Kinect
 
                     skeletonFrame.CopySkeletonDataTo(this.skeletonData);
 
+
                     /////////////////////// SELECTION SKELETON //////////////////////
 
                     // Assume no nearest skeleton and that the nearest skeleton is a long way away.
-                    var nearestDistance2 = double.MaxValue;
+                    float nearestDistance = (float)double.MaxValue;
 
                     i = 0;
                     foreach (Skeleton skeleton in skeletonData)
@@ -205,8 +186,16 @@ namespace Kinect
                         // Only consider tracked skeletons.
                         if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
                         {
-                            nearestId = SkeletonManagementData[i].NearestID((float)nearestDistance2, nearestId);
+                            if (SkeletonManagementData[i].isSkeletonNearest(nearestDistance))
+                            {
+                                // Récupère la plus proche distance
+                                nearestDistance = SkeletonManagementData[i].distance;
+
+                                // Récupère l'id du skeleton correspondant
+                                nearestId = SkeletonManagementData[i].skeleton.TrackingId;
+                            }
                         }
+
 
                         i++;
                     }
@@ -392,24 +381,6 @@ namespace Kinect
             highlightId = skeleton.TrackingId;
         }
 
-        /*
-        private Point GetJointPoint(Skeleton skeleton, JointType jointType)
-        {
-            var joint = skeleton.Joints[jointType];
-
-            // Points are centered on the StickMen canvas and scaled according to its height allowing
-            // approximately +/- 1.5m from center line.
-            var point = new Point
-            {
-                X = (StickMen.Width / 2) + (StickMen.Height * joint.Position.X / 3),
-                Y = (StickMen.Width / 2) - (StickMen.Height * joint.Position.Y / 3)
-            };
-
-            return point;
-        }
-        */
-      
-
         private string _gesture;
         public String Gesture
         {
@@ -481,7 +452,6 @@ namespace Kinect
                     break;
             }
 
-            //  _clearTimer.Start();
         }
 
     }

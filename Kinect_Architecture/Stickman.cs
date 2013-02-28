@@ -61,15 +61,6 @@ namespace Kinect_Architecture
             this.StickMen = StickMen;
         }
 
-        public void setBrush(Brush brush)
-        {
-            this.brush = brush;
-        }
-
-        public void setThickness(int thickness)
-        {
-            this.thickness = thickness;
-        }
 
         public Point GetJointPoint(JointType jointType)
         {
@@ -87,33 +78,6 @@ namespace Kinect_Architecture
         }
 
         // DESSIN DU STICKMEN
-        public void DrawStickMan()
-        {
-            foreach (var run in SkeletonSegmentRuns)
-            {
-                var next = this.GetJointPoint(run[0]);
-                for (var i = 1; i < run.Length; i++)
-                {
-                    var prev = next;
-                    next = this.GetJointPoint(run[i]);
-
-                    var line = new Line
-                    {
-                        Stroke = this.brush,
-                        StrokeThickness = this.thickness,
-                        X1 = prev.X,
-                        Y1 = prev.Y,
-                        X2 = next.X,
-                        Y2 = next.Y,
-                        StrokeEndLineCap = PenLineCap.Round,
-                        StrokeStartLineCap = PenLineCap.Round
-                    };
-
-                    this.StickMen.Children.Add(line);
-                }
-            }
-        }
-
         public void DrawStickMan(Brush brush, int thickness)
         {
             foreach (var run in SkeletonSegmentRuns)

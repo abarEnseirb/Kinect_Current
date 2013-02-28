@@ -26,6 +26,7 @@ namespace Kinect_Architecture
     {
         public Skeleton skeleton { get; set; }
         public Stickman stickman { get; set; }
+        public float distance {get; set;}
 
         public SkeletonManagement(Skeleton skeleton, Canvas StickMen)
         {
@@ -33,34 +34,23 @@ namespace Kinect_Architecture
             this.stickman = new Stickman(skeleton, StickMen);
         }
 
-
-        // Vérifie si la distance du skeleton est la plus proche et renvoit l'id le plus proche
-        public int NearestID(float nearestDistance2, int nearestId)
+       
+        // Calcule la distance du skeleton et compare avec la plus proche connue
+        public bool isSkeletonNearest(float nearestDistance)
         {
-            var newNearestId = -1;
-
             // Find the distance squared.
-            var distance2 = (this.skeleton.Position.X * this.skeleton.Position.X) +
+            this.distance = (this.skeleton.Position.X * this.skeleton.Position.X) +
                 (this.skeleton.Position.Y * this.skeleton.Position.Y) +
                 (this.skeleton.Position.Z * this.skeleton.Position.Z);
 
-            // Is the new distance squared closer than the nearest so far?
-            if (distance2 < nearestDistance2)
-            {
-                // Use the new values.
-                newNearestId = skeleton.TrackingId;
-                nearestDistance2 = distance2;
-            }
-
-            if (nearestId != newNearestId)
-            {
-                nearestId = newNearestId;
-            }
-
-            return nearestId;
+            if (this.distance < nearestDistance)
+                return true;
+            else
+                return false;
+                
         }
 
-
+        // Place une icone MAIN à l'emplacement de la main la plus haute
         public ColorImagePoint HandFocus(KinectSensor sensor, Image curseur)
         {
             CoordinateMapper cmLeft = new CoordinateMapper(sensor);
