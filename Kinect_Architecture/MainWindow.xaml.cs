@@ -34,7 +34,6 @@ namespace Kinect
 
 
         private KinectSensor sensor;
-        private Skeleton[] skeletonData = new Skeleton[0];
         public Skeleton skeletonFocus = new Skeleton();
         private ColorImageFormat lastImageFormat = ColorImageFormat.Undefined;
         private Byte[] pixelData;
@@ -160,31 +159,27 @@ namespace Kinect
                 if (skeletonFrame != null)
                 {
 
-
-                    if ((this.skeletonData.Length != skeletonFrame.SkeletonArrayLength))
+                    if ((this.SkeletonManagementData.Length != skeletonFrame.SkeletonArrayLength))
                     {
-                        skeletonData = new Skeleton[skeletonFrame.SkeletonArrayLength];
-
                         // Actualise le tableau de SkeletonManagement en fonction du nombre de Skeleton
                         SkeletonManagementData = new SkeletonManagement[skeletonFrame.SkeletonArrayLength];
                     }
 
-                    skeletonFrame.CopySkeletonDataTo(this.skeletonData);
-
+                    for (i = 0; i < SkeletonManagementData.Length; i++)
+                    {
+                        // Initialise les skeletons du tableau skeletonManagementData à partir des skeletons détectés
+                        SkeletonManagementData[i] = new SkeletonManagement(skeletonFrame, i, StickMen);
+                    }
 
                     /////////////////////// SELECTION SKELETON //////////////////////
 
                     // Assume no nearest skeleton and that the nearest skeleton is a long way away.
                     float nearestDistance = (float)double.MaxValue;
 
-                    i = 0;
-                    foreach (Skeleton skeleton in skeletonData)
+                    for (i = 0; i < SkeletonManagementData.Length; i++)
                     {
-                        // Ajout du skeleton au tableau de gestion des skeletons
-                        SkeletonManagementData[i] = new SkeletonManagement(skeleton, StickMen);
-
                         // Only consider tracked skeletons.
-                        if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
+                        if (SkeletonManagementData[i].skeleton.TrackingState == SkeletonTrackingState.Tracked)
                         {
                             if (SkeletonManagementData[i].isSkeletonNearest(nearestDistance))
                             {
@@ -195,36 +190,30 @@ namespace Kinect
                                 nearestId = SkeletonManagementData[i].skeleton.TrackingId;
                             }
                         }
-
-
-                        i++;
                     }
+
                     ///////////////////////// STICKMAN //////////////////////////
 
                     // Remove any previous skeletons.
                     StickMen.Children.Clear();
 
-                    i = 0;
-                    foreach (Skeleton skeleton in skeletonData)
+                    for (i = 0; i < SkeletonManagementData.Length; i++)
                     {
-                        if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
+                        if (SkeletonManagementData[i].skeleton.TrackingState == SkeletonTrackingState.Tracked)
                         {
                             // Dessine un stickman en fond
                             SkeletonManagementData[i].stickman.DrawStickMan(Brushes.WhiteSmoke, 7);
                         }
-
-                        i++;
                     }
 
-                    i = 0;
-                    foreach (Skeleton skeleton in skeletonData)
+                    for (i = 0; i < SkeletonManagementData.Length; i++)
                     {
                         // Only draw tracked skeletons.
-                        if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
+                        if (SkeletonManagementData[i].skeleton.TrackingState == SkeletonTrackingState.Tracked)
                         {
                             // Pick a brush, Red for a skeleton that has recently gestures, black for the nearest, gray otherwise.
-                            var brush = DateTime.UtcNow < highlightTime && skeleton.TrackingId == highlightId ? Brushes.Red :
-                                skeleton.TrackingId == nearestId ? Brushes.Black : Brushes.Gray;
+                            var brush = DateTime.UtcNow < highlightTime && SkeletonManagementData[i].skeleton.TrackingId == highlightId ? Brushes.Red :
+                                SkeletonManagementData[i].skeleton.TrackingId == nearestId ? Brushes.Black : Brushes.Gray;
 
                             // Draw the individual skeleton.
                             SkeletonManagementData[i].stickman.DrawStickMan(brush, 3);
@@ -233,10 +222,10 @@ namespace Kinect
                      
                         ////////////////////////// CURSEUR ///////////////////////////////
 
-                        if (skeleton.TrackingId == nearestId)
+                        if (SkeletonManagementData[i].skeleton.TrackingId == nearestId)
                         {
-                            skeletonFocus = skeleton;
-                            gestureController.UpdateAllGestures(skeleton);
+                            skeletonFocus = SkeletonManagementData[i].skeleton;
+                            gestureController.UpdateAllGestures(SkeletonManagementData[i].skeleton);
 
                             //  nearestId = skeleton.TrackingId;
 
@@ -294,7 +283,6 @@ namespace Kinect
                                 }
                             }
                         }
-                        i++;
                     }
                 }
             }
