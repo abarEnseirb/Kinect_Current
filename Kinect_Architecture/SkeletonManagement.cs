@@ -32,6 +32,7 @@ namespace Kinect_Architecture
         {
             this.skeleton = skeleton;
             this.stickman = new Stickman(skeleton, StickMen);
+            this.distance = -1;
         }
 
        

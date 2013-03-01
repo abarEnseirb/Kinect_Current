@@ -163,7 +163,7 @@ namespace Kinect
 
                     if ((this.skeletonData.Length != skeletonFrame.SkeletonArrayLength))
                     {
-                        this.skeletonData = new Skeleton[skeletonFrame.SkeletonArrayLength];
+                        skeletonData = new Skeleton[skeletonFrame.SkeletonArrayLength];
 
                         // Actualise le tableau de SkeletonManagement en fonction du nombre de Skeleton
                         SkeletonManagementData = new SkeletonManagement[skeletonFrame.SkeletonArrayLength];

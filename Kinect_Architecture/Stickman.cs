@@ -61,7 +61,7 @@ namespace Kinect_Architecture
             this.StickMen = StickMen;
         }
 
-
+        // Coordonnées du centre du Stickman
         public Point GetJointPoint(JointType jointType)
         {
             var joint = this.skeleton.Joints[jointType];
