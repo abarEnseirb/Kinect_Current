@@ -70,6 +70,8 @@
     <Compile Include="Curseur.cs" />
     <Compile Include="Gesture.cs" />
     <Compile Include="GestureCamera.cs" />
+    <Compile Include="KinectMain.cs" />
+    <Compile Include="SkeletonMain.cs" />
     <Compile Include="SkeletonManagement.cs" />
     <Compile Include="Stickman.cs" />
     <Page Include="MainWindow.xaml">
@@ -106,6 +108,8 @@
     <None Include="ClassDiagram1.cd" />
     <None Include="ClassDiagram2.cd" />
     <None Include="ClassDiagram3.cd" />
+    <None Include="ClassDiagram4.cd" />
+    <None Include="ClassDiagram5.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

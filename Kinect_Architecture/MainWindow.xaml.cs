@@ -35,10 +35,10 @@ namespace Kinect
         private Curseur curseur;
         private KinectSensor sensor;
         public Skeleton skeletonFocus = new Skeleton();
-        private ColorImageFormat lastImageFormat = ColorImageFormat.Undefined;
-        private Byte[] pixelData;
-        private WriteableBitmap outputImage;
-        private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
+        //private ColorImageFormat lastImageFormat = ColorImageFormat.Undefined;
+        //private Byte[] pixelData;
+        //private WriteableBitmap outputImage;
+       // private static readonly int Bgr32BytesPerPixel = (PixelFormats.Bgr32.BitsPerPixel + 7) / 8;
         private int compteur = 0;
         public GestureController gestureController;
         private int xZoomL, xZoomR;
@@ -74,8 +74,8 @@ namespace Kinect
                 sensor.SkeletonStream.Enable();
                 //sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
                 sensor.SkeletonFrameReady += this.sensor_AllFramesReady;
-                sensor.ColorStream.Enable(ColorImageFormat.RgbResolution1280x960Fps12);
-                sensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(sensor_ColorFrameReady);
+              //  sensor.ColorStream.Enable(ColorImageFormat.RgbResolution1280x960Fps12);
+              //  sensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(sensor_ColorFrameReady);
                 sensor.Start();
 
                 //sensor.ElevationAngle = Convert.ToInt32("10");
@@ -84,35 +84,35 @@ namespace Kinect
             }
         }
 
-        // For colorFrame 
-        private void sensor_ColorFrameReady(Object sender, ColorImageFrameReadyEventArgs e)
-        {
-            using (ColorImageFrame imageFrame = e.OpenColorImageFrame())
-            {
-                if (imageFrame != null)
-                {
-                    bool newFormat = this.lastImageFormat != imageFrame.Format;
+        //// For colorFrame 
+        //private void sensor_ColorFrameReady(Object sender, ColorImageFrameReadyEventArgs e)
+        //{
+        //    using (ColorImageFrame imageFrame = e.OpenColorImageFrame())
+        //    {
+        //        if (imageFrame != null)
+        //        {
+        //            bool newFormat = this.lastImageFormat != imageFrame.Format;
 
-                    if (newFormat)
-                    {
-                        this.pixelData = new Byte[imageFrame.PixelDataLength];
-                    }
+        //            if (newFormat)
+        //            {
+        //                this.pixelData = new Byte[imageFrame.PixelDataLength];
+        //            }
 
-                    imageFrame.CopyPixelDataTo(pixelData);
+        //            imageFrame.CopyPixelDataTo(pixelData);
 
-                    if (newFormat)
-                    {
-                        this.video.Visibility = Visibility.Visible;
-                        this.outputImage = new WriteableBitmap(imageFrame.Width, imageFrame.Height, 0, 0, PixelFormats.Bgr32, null);
-                        this.video.Source = this.outputImage;
-                    }
-                    this.outputImage.WritePixels(new Int32Rect(0, 0, imageFrame.Width, imageFrame.Height), this.pixelData, imageFrame.Width * Bgr32BytesPerPixel, 0);
-                    this.lastImageFormat = imageFrame.Format;
+        //            if (newFormat)
+        //            {
+        //                this.video.Visibility = Visibility.Visible;
+        //                this.outputImage = new WriteableBitmap(imageFrame.Width, imageFrame.Height, 0, 0, PixelFormats.Bgr32, null);
+        //                this.video.Source = this.outputImage;
+        //            }
+        //            this.outputImage.WritePixels(new Int32Rect(0, 0, imageFrame.Width, imageFrame.Height), this.pixelData, imageFrame.Width * Bgr32BytesPerPixel, 0);
+        //            this.lastImageFormat = imageFrame.Format;
 
-                }
-            }
+        //        }
+        //    }
 
-        }
+        //}
 
         //For Skeleton
         private void sensor_AllFramesReady(Object sender, SkeletonFrameReadyEventArgs e)
