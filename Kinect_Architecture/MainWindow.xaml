@@ -7,7 +7,7 @@
         <Image x:Name="video" HorizontalAlignment="Left" Height="960" VerticalAlignment="Top" Width="1280" Loaded="Window_Loaded" Margin="0,0,-8,-30"/>
 
         <Canvas Name ="SkeletCanvas" Margin="-640,-100,0,0"  Height="1920" VerticalAlignment="Top" HorizontalAlignment="Left" Width="2560" Background="AliceBlue">
-            <Image x:Name ="curseur" Height="80" Width="80" Canvas.Left="192" Canvas.Top="60" Source="Ressources/Images/hand_r.png" RenderTransformOrigin="0.5,0.56" Visibility="Hidden" />
+            <Image x:Name ="curseur_image" Height="80" Width="80" Canvas.Left="192" Canvas.Top="60" Source="Ressources/Images/hand_r.png" RenderTransformOrigin="0.5,0.56" Visibility="Hidden" />
             <Ellipse Name="Rond" Stroke="GreenYellow" StrokeThickness="0" HorizontalAlignment="Left" Height="80" VerticalAlignment="Top" Width="80" Canvas.Left="192" Canvas.Top="60" Opacity="0.9" />
             <Image x:Name ="select" Height="100" Width="100" Canvas.Left="673" Canvas.Top="132" Source="Ressources/Images/play.png" RenderTransformOrigin="0.5,0.56" Visibility="Visible" />
             <Canvas x:Name="StickMen" Width="200" Height="150" HorizontalAlignment="Right" VerticalAlignment="Bottom" Canvas.Left="1533" Canvas.Top="864"/>

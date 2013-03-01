@@ -67,6 +67,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Curseur.cs" />
+    <Compile Include="Gesture.cs" />
+    <Compile Include="GestureCamera.cs" />
     <Compile Include="SkeletonManagement.cs" />
     <Compile Include="Stickman.cs" />
     <Page Include="MainWindow.xaml">

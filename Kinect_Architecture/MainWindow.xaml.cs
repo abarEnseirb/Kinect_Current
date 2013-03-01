@@ -32,7 +32,7 @@ namespace Kinect
     {
         private int nearestId = -1;
 
-
+        private Curseur curseur;
         private KinectSensor sensor;
         public Skeleton skeletonFocus = new Skeleton();
         private ColorImageFormat lastImageFormat = ColorImageFormat.Undefined;
@@ -42,6 +42,7 @@ namespace Kinect
         private int compteur = 0;
         public GestureController gestureController;
         private int xZoomL, xZoomR;
+        private GestureCamera gestureCamera;
 
         private SkeletonManagement[] SkeletonManagementData = new SkeletonManagement[0];                // Tableau pour la gestion des SkeletonManagement
         private int i;
@@ -59,46 +60,8 @@ namespace Kinect
         public MainWindow()
         {
             InitializeComponent();
-            // Create the gesture recognizer.
-            //this.activeRecognizer = this.CreateRecognizer();
-
-            gestureController = new GestureController();
-            gestureController.GestureRecognized += OnGestureRecognized;
-            IRelativeGestureSegment[] swipeleftSegments = new IRelativeGestureSegment[3];
-            swipeleftSegments[0] = new SwipeLeftSegment1();
-            swipeleftSegments[1] = new SwipeLeftSegment2();
-            swipeleftSegments[2] = new SwipeLeftSegment3();
-            gestureController.AddGesture("SwipeLeft", swipeleftSegments);
-
-            IRelativeGestureSegment[] swiperightSegments = new IRelativeGestureSegment[3];
-            swiperightSegments[0] = new SwipeRightSegment1();
-            swiperightSegments[1] = new SwipeRightSegment2();
-            swiperightSegments[2] = new SwipeRightSegment3();
-            gestureController.AddGesture("SwipeRight", swiperightSegments);
-
-            //IRelativeGestureSegment[] zoomInSegments = new IRelativeGestureSegment[3];
-            //zoomInSegments[0] = new ZoomSegment1();
-            //zoomInSegments[1] = new ZoomSegment2();
-            //zoomInSegments[2] = new ZoomSegment3();
-            //gestureController.AddGesture("ZoomIn", zoomInSegments);
-
-            //IRelativeGestureSegment[] zoomOutSegments = new IRelativeGestureSegment[3];
-            //zoomOutSegments[0] = new ZoomSegment3();
-            //zoomOutSegments[1] = new ZoomSegment2();
-            //zoomOutSegments[2] = new ZoomSegment1();
-            //gestureController.AddGesture("ZoomOut", zoomOutSegments);
-
-            IRelativeGestureSegment[] swipeUpSegments = new IRelativeGestureSegment[3];
-            swipeUpSegments[0] = new SwipeUpSegment1();
-            swipeUpSegments[1] = new SwipeUpSegment2();
-            swipeUpSegments[2] = new SwipeUpSegment3();
-            gestureController.AddGesture("SwipeUp", swipeUpSegments);
-
-            IRelativeGestureSegment[] swipeDownSegments = new IRelativeGestureSegment[3];
-            swipeDownSegments[0] = new SwipeDownSegment1();
-            swipeDownSegments[1] = new SwipeDownSegment2();
-            swipeDownSegments[2] = new SwipeDownSegment3();
-            gestureController.AddGesture("SwipeDown", swipeDownSegments);
+            curseur = new Curseur(global, curseur_image, Rond);
+            gestureCamera = new GestureCamera();
         }
 
         //When your window is loaded
@@ -225,39 +188,28 @@ namespace Kinect
                         if (SkeletonManagementData[i].skeleton.TrackingId == nearestId)
                         {
                             skeletonFocus = SkeletonManagementData[i].skeleton;
-                            gestureController.UpdateAllGestures(SkeletonManagementData[i].skeleton);
+                            gestureCamera.OnGesture(SkeletonManagementData[i].skeleton);
 
                             //  nearestId = skeleton.TrackingId;
 
                             if (ZoomDezoom(skeletonFocus)) //mode zoom
                             {
-                                curseur.Visibility = Visibility.Hidden;
+                                curseur_image.Visibility = Visibility.Hidden;
                                 rectZoom.Visibility = Visibility.Visible;
 
                             }
                             else //mode curseur sinon
                             {
                                 rectZoom.Visibility = Visibility.Hidden;
+                                curseur.SetCurseur(sensor, SkeletonManagementData[i].skeleton);
 
-                                ColorImagePoint handColorPoint = SkeletonManagementData[i].HandFocus(sensor, curseur);
-
-                                Canvas.SetLeft(curseur, 2 * (handColorPoint.X) - (curseur.Width / 2));
-                                Canvas.SetTop(curseur, 2 * (handColorPoint.Y) - (curseur.Width / 2));
-                                Canvas.SetLeft(Rond, 2 * (handColorPoint.X) - (Rond.Width / 2));
-                                Canvas.SetTop(Rond, 2 * (handColorPoint.Y) - (Rond.Width / 2));
-                                Point rightHand = new Point(2 * handColorPoint.X, 2 * handColorPoint.Y);
-                                Point GridRightHand = new Point(handColorPoint.X, handColorPoint.Y);
-
-
-
-
-                                if (gridContainsCurseur(global, GridRightHand))
+                                if (curseur.gridContainsCurseur(global))
                                 {
-                                    curseur.Visibility = Visibility.Visible;
+                                    curseur_image.Visibility = Visibility.Visible;
 
                                     // on peut pas mettre un if pour chaque bouton => reflechir a une boucle qui les parcourt tous ? <=> tableau d'image bouton 
 
-                                    if (ImageContainsCurseur(select, rightHand))
+                                    if (curseur.ImageContainsCurseur(select))
                                     {
                                         Rond.StrokeThickness = compteur * Rond.Width / 100;
 
@@ -279,7 +231,7 @@ namespace Kinect
                                 }
                                 else
                                 {
-                                    curseur.Visibility = Visibility.Hidden;
+                                    curseur_image.Visibility = Visibility.Hidden;
                                 }
                             }
                         }
@@ -325,40 +277,6 @@ namespace Kinect
 
         // Méthode pour un zoom de la Kinect
 
-
-
-        private bool ImageContainsCurseur(Image rect, Point Curseur)
-        {
-            Double Left = Canvas.GetLeft(rect);
-            Double Top = Canvas.GetTop(rect);
-            Double Bottom = Top + rect.Height;
-            Double Right = Left + rect.Width;
-            if (Curseur.X > Left && Curseur.X < Right && Curseur.Y > Top && Curseur.Y < Bottom)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        private bool gridContainsCurseur(Grid grid, Point Curseur)
-        {
-            Double Left = 0;
-            Double Top = 0;
-            Double Bottom = Top + grid.ActualHeight;
-            Double Right = Left + grid.ActualWidth;
-
-            if (Curseur.X > Left && Curseur.X < Right && Curseur.Y > Top && Curseur.Y < Bottom)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
 
         private void HighlightSkeleton(Skeleton skeleton)
         {
